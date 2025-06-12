@@ -1,6 +1,6 @@
 import mongoose from "mongoose"
 import bcrypt from "bcryptjs"
-const UserSchema= new mongoose (
+const UserSchema= new mongoose.Schema (
   {
     fullname:{
       required: true,

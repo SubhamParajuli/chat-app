@@ -15,7 +15,7 @@ export async function signup(req,res){
        return res.status(400).json({message: "Password must be at least 6 characters."})
       }
    
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!emailRegex.test(email)) {
       return res.status(400).json({ message: "Invalid email format" });
@@ -36,9 +36,22 @@ export async function signup(req,res){
       profilePic: Avatar,
     })
 
+    //TODO: create the user in stream as well
+
+    const token= jwt.sign({userId:newUser._id},process.env.JWT_SECRET_KEY,{expiresIn:"7d"})
+
+    res.cookie("jwt",token,{
+      maxAge:7*24*60*60*1000,
+      httpOnly:true,//prevent XSS attacks
+      sameSite: "strict",//prevent CSRF attacks
+      secure: process.env.NODE_ENV=="production"
+    })
+
+    res.status(201).json({success:true, user:newUser})
 
   } catch (error) {
-    
+    console.log("Error in signup Controller",error)
+    res.status(500).json({message:"Internal Server Error"})
   }
 }
 
