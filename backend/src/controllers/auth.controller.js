@@ -29,7 +29,7 @@ export async function signup(req,res){
     const indx=Math.floor(Math.random()*100)+1;
     const Avatar =`https://avatar.iran.liara.run/public/${indx}`
 
-    const newUser= new User.create({
+    const newUser= await User.create({
       email,
       fullName,
       password,
