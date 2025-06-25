@@ -3,8 +3,8 @@ import bcrypt from "bcryptjs"
 const UserSchema= new mongoose.Schema (
   {
     fullname:{
-      required: true,
-      type:String,
+     type:String,
+     required:true,
     },
     email:{
       type:String,
@@ -52,27 +52,31 @@ const UserSchema= new mongoose.Schema (
 
 
 //prehook
-// UserSchema.pre("save",async function(next){
-//   try {
-//     const salt=await bcrypt.genSalt(10);
-//     this.password= await bcrypt.hash(this.password,salt);
-//     next();
-//   } catch (error) {
-//      next(error)
-//   }
-// })
-
 UserSchema.pre("save",async function(next){
-  if(!this.isModified("password"))return next();
   try {
-    this.password = bcrypt.hash(this.password,10)//encrypt password
-    next()
-    
+    const salt=await bcrypt.genSalt(10);
+    this.password= await bcrypt.hash(this.password,salt);
+    next();
   } catch (error) {
-    next(error); 
+     next(error)
   }
-  
 })
+
+UserSchema.methods.matchPassword= async function(enteredPassword){
+  const isPasswordCorrect= await bcrypt.compare(enteredPassword, this.password)
+  return isPasswordCorrect
+}
+// UserSchema.pre("save",async function(next){
+//   if(!this.isModified("password"))return next();
+//   try {
+//     this.password = await bcrypt.hash(this.password,10)//encrypt password
+//     next()
+    
+//   } catch (error) {
+//     next(error); 
+//   }
+  
+// })
 
 const User= mongoose.model("User",UserSchema);
 
